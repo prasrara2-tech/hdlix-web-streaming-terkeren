@@ -1,0 +1,742 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>HDLIX | TV SHOWS Global</title>
+    <style>
+        /* --- CSS INTI & HEADER --- */
+        body {
+            background-image: url(img/bg.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: small;
+            color: white;
+        }
+        #main-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            margin: 0;
+            padding: 0;
+        }
+        #header { background-color: black; width: 100%; }
+        #logo { float: left; padding: 7px; }
+        #menu { float: left; margin-left: 50px; padding: 7px; }
+        #menu ul { margin: 0; padding: 0; list-style-type: none; }
+        
+        #menu ul li { 
+            float: left; 
+            padding: 5px; 
+            margin-right: 25px; 
+            text-align: center; 
+            color: grey; 
+            font-weight: bolder; 
+            font-size: 1.1em;
+        }
+        
+        #menu ul li a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        #menu ul li:hover { color: white; font-weight: bolder; cursor: pointer; }
+        
+        /* --- CSS Pencarian & Layout --- */
+        #search { float: right; padding: 7px; }
+        #search input[type=text] { height: 25px; border-radius: 5px; padding: 0 10px; border: none; }
+        #search input[type=submit] { background-color: lightseagreen; border: solid 1px lightseagreen; border-radius: 5px; height: 25px; padding-left: 15px; padding-right: 15px; color: white; cursor: pointer; }
+        
+        .separator { clear: both; }
+        #content-container { width: 90%; margin:auto; padding-bottom: 50px; }
+        
+        /* === HEADLINE === */
+        #video-player { 
+            margin-top: 32px; 
+            border: solid 1px black; 
+            border-radius: 10px; 
+            box-shadow: 5px 10px 18px black; 
+            height: 250px;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative;
+            flex-direction: column; 
+            
+            background-color: rgba(0, 0, 0, 0.9);
+            background-size: cover; 
+            background-position: center; 
+            padding: 0;
+        }
+        
+        .headline-hdlix {
+            font-size: 4.5em; 
+            margin: 10px 0; 
+            text-shadow: 2px 2px 4px #000; 
+            color: lightseagreen; 
+        }
+        .headline-slogan {
+            font-size: 1.5em; 
+            text-shadow: 2px 2px 4px #000; 
+            font-weight: 600;
+        }
+
+        .main-category {
+            margin-top: 60px;
+            padding-bottom: 20px;
+        }
+        
+        .category-title {
+            font-size: 26px;
+            font-family: Arial, sans-serif;
+            border-left: 4px solid lightseagreen;
+            padding-left: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .movie-category {
+            margin-top: 40px; 
+            position: relative;
+        }
+
+        /* --- CSS untuk Efek Slide (HORIZONTAL SCROLL) --- */
+        .movie-row-container {
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .movie-row-wrapper { 
+            display: flex; 
+            overflow-x: scroll;
+            /* Sembunyikan Scrollbar */
+            &::-webkit-scrollbar { display: none; }
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            
+            padding: 15px 0;
+            gap: 20px; 
+            scroll-behavior: smooth; 
+        }
+        
+        /* Tambahkan style untuk tag <a> yang membungkus item */
+        .movie-row-wrapper > a {
+            flex-shrink: 0; /* Penting agar item tidak melar */
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            width: 180px; /* Lebar harus ditentukan pada <a> */
+            height: 250px; /* Tinggi harus ditentukan pada <a> */
+            position: relative;
+            cursor: pointer;
+            
+            /* Transisi untuk HOVER (Dipindahkan dari .movie-item) */
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        /* === ITEM FILM & EFEK PENCARIAN (PENTING) === */
+        .movie-item {
+            /* Hapus width dan height dari sini, pindahkan ke <a> */
+            width: 100%; 
+            height: 100%; 
+            
+            margin-top: 0; /* Hapus margin-top 5px dari sini */
+            background-color: #333; 
+            border: 1px solid lightseagreen; 
+            border-radius: 5px;
+            box-shadow: 5px 10px 18px black;
+            position: relative;
+            
+            display: flex;
+            flex-direction: column; 
+            overflow: hidden; 
+            /* Hapus transisi hover dari sini */
+            transition: none; 
+        }
+
+        /* Efek Hover dipindahkan ke <a> */
+        .movie-row-wrapper > a:hover {
+            border-color: white;
+            transform: scale(1.03); 
+            z-index: 10;
+        }
+        
+        /* CSS untuk Menyembunyikan Item saat Filtering (sekarang menargetkan <a>) */
+        .movie-row-wrapper > a.hidden {
+            display: none !important; 
+        }
+        
+        .movie-item img { 
+            display: block; 
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+        } 
+        
+        .movie-item .title { 
+            position: absolute; 
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.75); 
+            color: white; 
+            text-align: center; 
+            width: 100%; 
+            padding: 5px 5px;
+            line-height: 1.2;
+            box-sizing: border-box; 
+            font-size: 0.9em; /* Sesuaikan ukuran font */
+            font-weight: 600; /* Sesuaikan ketebalan font */
+            
+            /* Transisi untuk warna teks judul */
+            transition: color 0.3s; 
+        }
+        
+        /* Efek hover pada teks judul saat <a> di-hover */
+        .movie-row-wrapper > a:hover .title {
+             color: lightseagreen; 
+        }
+        
+        /* --- CSS untuk Tombol Slide (TETAP) --- */
+        .slide-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%); 
+            width: 35px; 
+            height: calc(100% - 30px);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.5em; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            padding: 0;
+            opacity: 0.7;
+        }
+
+        .slide-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            opacity: 1;
+        }
+
+        .slide-button-prev {
+            left: 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .slide-button-next {
+            right: 0;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .slide-button[style*="display: none"] {
+            display: none !important;
+        }
+        
+        /* --- FOOTER --- */
+        #footer { width: 100%; background-color: #111; color: #aaa; text-align: center; padding: 20px 0; margin-top: 50px; font-size: 0.8em; }
+        #footer a { color: lightseagreen; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <div id="header">
+            <div id="logo">
+                <img src="img/bg7.png" height="120px" alt="Website Logo HDLIX"> 
+            </div>
+            <div id="menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="moviespage.html">Movies</a></li>
+                    <li><a href="tvshowpage.html">Tv Shows</a></li>
+                    <li><a href="genre.html">Genre</a></li>
+                </ul>
+            </div>
+            <div id="search">
+                <form id="searchForm" action="gemini.html" method="GET"> 
+                    <input type="text" name="keyword" id="searchInput" placeholder="Search for TV Shows...">
+                    <input type="submit" value="Search">
+                </form>
+            </div>
+            <div class="separator"></div>
+        </div>
+        
+        <div id="content-container">
+
+            <div id="video-player">
+                <h1 class="headline-hdlix">-HDLIX-</h1>
+                <p class="headline-slogan">Koleksi TV Show dan Serial Global Terbaik</p>
+            </div>
+            <div class="separator"></div>
+            
+            <div class="main-category" id="all-tvshows-category">
+                
+                <div class="movie-category" id="action-crime-thriller-category">
+                    <h2 class="category-title" id="category-title-action"> Aksi, Kriminal, & Thriller</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="action-crime-thriller-prev" onclick="scrollMovies('action-crime-thriller-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="action-crime-thriller-row-wrapper">
+                            
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="squid game">
+                                    <img src="image/tvshow/g1.webp" alt="Squid Game">
+                                    <div class="title">Squid Game</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="money heist">
+                                    <img src="image/tvshow/2.webp" alt="Money Heist">
+                                    <div class="title">Money Heist</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="the worst of evil">
+                                    <img src="image/tvshow/3.webp" alt="The Worst Of Evil">
+                                    <div class="title">The Worst Of Evil</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="game of thrones">
+                                    <img src="image/tvshow/4.webp" alt="Game of Thrones">
+                                    <div class="title">Game of Thrones</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="peaky blinders">
+                                    <img src="image/tvshow/5.webp" alt="Peaky Blinders">
+                                    <div class="title">Peaky Blinders</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="my name">
+                                    <img src="image/tvshow/6.webp" alt="My Name">
+                                    <div class="title">My Name</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="ozark">
+                                    <img src="image/tvshow/7.webp" alt="Ozark">
+                                    <div class="title">Ozark</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="vagabond">
+                                    <img src="image/tvshow/8.webp" alt="Vagabond">
+                                    <div class="title">Vagabond</div>
+                                </div>
+                            </a>
+                            
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="action-crime-thriller-next" onclick="scrollMovies('action-crime-thriller-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="movie-category" id="drama-romance-history-category">
+                    <h2 class="category-title" id="category-title-drama"> Drama, Romantis, & Sejarah</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="drama-romance-history-prev" onclick="scrollMovies('drama-romance-history-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="drama-romance-history-row-wrapper">
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="crash landing on you">
+                                    <img src="image/tvshow/9.webp" alt="Crash Landing on You">
+                                    <div class="title">Crash Landing on You</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="the crown">
+                                    <img src="image/tvshow/10.webp" alt="The Crown">
+                                    <div class="title">The Crown</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="descendants of the sun">
+                                    <img src="image/tvshow/11.webp" alt="Descendants of the Sun">
+                                    <div class="title">Descendants of the Sun</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="talamasca the secret orders">
+                                    <img src="image/tvshow/12.webp" alt="The Queen's Gambit">
+                                    <div class="title">Talamasca: The Secret Orders</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="hospital playlist">
+                                    <img src="image/tvshow/13.webp" alt="Hospital Playlist">
+                                    <div class="title">Hospital Playlist</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="bridgerton">
+                                    <img src="image/tvshow/14.webp" alt="Bridgerton">
+                                    <div class="title">Bridgerton</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="mr. sunshine">
+                                    <img src="image/tvshow/15.webp" alt="Mr. Sunshine">
+                                    <div class="title">Mr. Sunshine</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="tulsa king">
+                                    <img src="image/tvshow/16.webp" alt="Downton Abbey">
+                                    <div class="title">Tulsa King</div>
+                                </div>
+                            </a>
+                            
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="drama-romance-history-next" onclick="scrollMovies('drama-romance-history-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+                
+                <hr>
+
+                <div class="movie-category" id="scifi-fantasy-horror-category">
+                    <h2 class="category-title" id="category-title-scifi"> Fiksi Ilmiah, Fantasi, & Horor</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="scifi-fantasy-horror-prev" onclick="scrollMovies('scifi-fantasy-horror-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="scifi-fantasy-horror-row-wrapper">
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="sweet home">
+                                    <img src="image/tvshow/17.webp" alt="Sweet Home">
+                                    <div class="title">Sweet Home</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="stranger things">
+                                    <img src="image/tvshow/18.webp" alt="Stranger Things">
+                                    <div class="title">Stranger Things</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="alchemy of souls">
+                                    <img src="image/tvshow/19.webp" alt="Alchemy of Souls">
+                                    <div class="title">Alchemy of Souls</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="the mandalorian">
+                                    <img src="image/tvshow/20.webp" alt="The Mandalorian">
+                                    <div class="title">The Mandalorian</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="kingdom">
+                                    <img src="image/tvshow/21.webp" alt="Kingdom">
+                                    <div class="title">Kingdom</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="the umbrella academy">
+                                    <img src="image/tvshow/22.webp" alt="The Umbrella Academy">
+                                    <div class="title">The Umbrella Academy</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="black knight">
+                                    <img src="image/tvshow/23.webp" alt="Black Knight">
+                                    <div class="title">Black Knight</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="the witcher">
+                                    <img src="image/tvshow/24.webp" alt="The Witcher">
+                                    <div class="title">The Witcher</div>
+                                </div>
+                            </a>
+                            
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="scifi-fantasy-horror-next" onclick="scrollMovies('scifi-fantasy-horror-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+                
+                <hr>
+
+                <div class="movie-category" id="comedy-family-documentary-category">
+                    <h2 class="category-title" id="category-title-comedy"> Komedi, Keluarga, & Dokumenter</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="comedy-family-documentary-prev" onclick="scrollMovies('comedy-family-documentary-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="comedy-family-documentary-row-wrapper">
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="the manipulated">
+                                    <img src="image/tvshow/25.webp" alt="The Office">
+                                    <div class="title">The Manipulated</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="taxi driver">
+                                    <img src="image/tvshow/26.webp" alt="What's Wrong with Secretary Kim">
+                                    <div class="title">Taxi driver</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="typhoon trading">
+                                    <img src="image/tvshow/27.webp" alt="Our Planet">
+                                    <div class="title">Typhoon Trading</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="modern family">
+                                    <img src="image/tvshow/28.webp" alt="Modern Family">
+                                    <div class="title">Modern Family</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="dynamite kiss">
+                                    <img src="image/tvshow/29.webp" alt="Business Proposal">
+                                    <div class="title">Dynamite Kiss</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="alien earth">
+                                    <img src="image/tvshow/30.webp" alt="Planet Earth">
+                                    <div class="title">Alien Earth</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="heroes next door">
+                                    <img src="image/tvshow/31.webp" alt="Parks and Recreation">
+                                    <div class="title">Heroes Next Door</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item" data-title="my youth">
+                                    <img src="image/tvshow/32.webp" alt="Strong Girl Bong-soon">
+                                    <div class="title">My Youth</div>
+                                </div>
+                            </a>
+                            
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="comedy-family-documentary-next" onclick="scrollMovies('comedy-family-documentary-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="footer">
+            <p>&copy; 2025 HDLIX. All Rights Reserved. Designed by <a href="#">Prasetyo</a></p>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * Fungsi utama untuk menggulir baris film secara horizontal.
+         */
+        function scrollMovies(wrapperId, distance) {
+            const wrapper = document.getElementById(wrapperId);
+            
+            if (wrapper) {
+                wrapper.scrollBy({
+                    left: distance,
+                    behavior: 'smooth'
+                });
+                
+                setTimeout(() => {
+                    updateSlideButtons(wrapperId);
+                }, 500); 
+            }
+        }
+
+        /**
+         * Fungsi untuk menampilkan atau menyembunyikan tombol prev/next berdasarkan posisi scroll.
+         */
+        function updateSlideButtons(wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+            if (!wrapper) return;
+
+            const categoryName = wrapperId.replace('-row-wrapper', '');
+            const prevButton = document.getElementById(categoryName + '-prev');
+            const nextButton = document.getElementById(categoryName + '-next');
+
+            const scrollLeft = wrapper.scrollLeft;
+            const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+
+            // Logika Tombol PREV
+            if (prevButton) {
+                if (scrollLeft < 20) {
+                    prevButton.style.display = 'none';
+                } else {
+                    prevButton.style.display = 'flex';
+                }
+            }
+
+            // Logika Tombol NEXT
+            if (nextButton) {
+                if (wrapper.scrollWidth <= wrapper.clientWidth) {
+                    // Sembunyikan jika konten tidak melebihi lebar kontainer
+                    if (prevButton) prevButton.style.display = 'none';
+                    nextButton.style.display = 'none';
+                } else if (scrollLeft >= maxScroll - 20) {
+                    // Sembunyikan tombol kanan jika sudah di akhir
+                    nextButton.style.display = 'none';
+                } else {
+                    nextButton.style.display = 'flex';
+                }
+            }
+        }
+        
+        /**
+         * Fungsi untuk mengalihkan ke halaman spesifik atau membiarkan form submit ke gemini.html.
+         * Perlu sedikit penyesuaian untuk pencarian agar menargetkan <a>.
+         */
+        function handleCrossPageSearch(e) {
+            
+            const searchInput = document.getElementById('searchInput');
+            const keyword = searchInput.value.toLowerCase().trim();
+
+            if (keyword.includes('avatar')) {
+                // Contoh pengalihan spesifik ke halaman detail film
+                e.preventDefault(); 
+                window.location.href = 'avatar.html'; 
+                return; 
+            }
+            
+            // Logika baru: Lakukan filter lokal di halaman TV Shows
+            filterTVShows(keyword);
+            e.preventDefault(); // Mencegah form submit default ke gemini.html
+
+        }
+        
+        /**
+         * Fungsi Pencarian/Filter Lokal untuk TV Shows
+         * Menargetkan tag <a> yang baru
+         */
+        function filterTVShows(keyword) {
+            const wrappers = [
+                'action-crime-thriller-row-wrapper', 
+                'drama-romance-history-row-wrapper', 
+                'scifi-fantasy-horror-row-wrapper', 
+                'comedy-family-documentary-row-wrapper'
+            ];
+            
+            const lowerCaseKeyword = keyword.toLowerCase().trim();
+            let totalVisibleCount = 0;
+
+            wrappers.forEach(wrapperId => {
+                const wrapper = document.getElementById(wrapperId);
+                if (!wrapper) return;
+                
+                // Sekarang menargetkan tag <a> langsung
+                const items = wrapper.querySelectorAll('.movie-row-wrapper > a');
+                let visibleCount = 0;
+
+                items.forEach(item => {
+                    // Mengambil judul dari data-title atau dari .title div
+                    const titleText = item.querySelector('.movie-item').getAttribute('data-title') || item.querySelector('.title').textContent.trim().toLowerCase();
+                    
+                    if (titleText.includes(lowerCaseKeyword)) {
+                        item.classList.remove('hidden'); 
+                        visibleCount++;
+                    } else {
+                        item.classList.add('hidden'); 
+                    }
+                });
+                
+                totalVisibleCount += visibleCount;
+                
+                // Opsional: Perbarui judul kategori berdasarkan filter
+                const categoryTitleElement = document.getElementById(wrapperId.replace('-row-wrapper', '') + '-category').querySelector('.category-title');
+                if (categoryTitleElement) {
+                    const originalTitle = categoryTitleElement.getAttribute('data-original-title') || categoryTitleElement.textContent;
+                    categoryTitleElement.setAttribute('data-original-title', originalTitle);
+                    
+                    if (lowerCaseKeyword.length > 0) {
+                         if (visibleCount > 0) {
+                            categoryTitleElement.textContent = originalTitle; // Tetap tampilkan nama kategori jika ada hasil
+                        } else {
+                             // Sembunyikan kategori jika tidak ada hasil, atau tunjukkan pesan 'Tidak ditemukan'
+                             // Kita akan biarkan judul asli jika tidak ada hasil di baris ini
+                             // Untuk menampilkan pesan "Tidak ditemukan", kita bisa menggunakan logika terpusat di bawah.
+                        }
+                    } else {
+                        categoryTitleElement.textContent = originalTitle;
+                    }
+                }
+            });
+            
+            // Opsional: Perbarui headline untuk menampilkan hasil pencarian global
+             const headlineSlogan = document.querySelector('.headline-slogan');
+             if (headlineSlogan) {
+                if (lowerCaseKeyword.length > 0) {
+                    if (totalVisibleCount > 0) {
+                        headlineSlogan.textContent = `Ditemukan ${totalVisibleCount} hasil untuk "${keyword}"`;
+                    } else {
+                        headlineSlogan.textContent = `Tidak ditemukan hasil untuk "${keyword}"`;
+                    }
+                } else {
+                    headlineSlogan.textContent = "Koleksi TV Show dan Serial Global Terbaik";
+                }
+            }
+        }
+
+
+        // Panggil saat halaman dimuat untuk inisialisasi tombol
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrappers = [
+                'action-crime-thriller-row-wrapper', 
+                'drama-romance-history-row-wrapper', 
+                'scifi-fantasy-horror-row-wrapper', 
+                'comedy-family-documentary-row-wrapper'
+            ];
+            
+            // Inisialisasi tombol slide
+            wrappers.forEach(id => {
+                updateSlideButtons(id);
+                
+                const wrapper = document.getElementById(id);
+                if (wrapper) {
+                    // Perbarui tombol saat user scroll manual
+                    wrapper.addEventListener('scroll', () => updateSlideButtons(id));
+                }
+            });
+            
+            // Perbarui tombol saat ukuran jendela berubah
+            window.addEventListener('resize', () => {
+                wrappers.forEach(id => updateSlideButtons(id));
+            });
+
+            // Sinkronisasi Pencarian
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            
+            if (searchForm) {
+                searchForm.addEventListener('submit', handleCrossPageSearch);
+            }
+            
+            // Listener untuk mereset tampilan saat input diketik/dikosongkan
+            searchInput.addEventListener('keyup', function() {
+                setTimeout(() => {
+                    const keyword = searchInput.value;
+                    filterTVShows(keyword);
+                }, 300); 
+            });
+            
+            // Inisialisasi filter jika ada keyword di URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialKeyword = urlParams.get('keyword');
+            if (initialKeyword) {
+                searchInput.value = initialKeyword;
+                filterTVShows(initialKeyword);
+            }
+        });
+
+    </script>
+    
+</body>
+</html>

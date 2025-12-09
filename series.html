@@ -1,0 +1,510 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Website Layout</title>
+<style>
+body {
+background-image: url(img/bg.jpg);
+background-repeat: no-repeat;
+background-size: cover;
+background-attachment: fixed;
+font-family: Verdana, Geneva, Tahoma, sans-serif;
+font-size: small;
+}
+#main-container {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+background-color: rgba(0, 0, 0, 0.6);
+color: white;
+margin: 0;
+padding: 0;
+}
+#header {
+background-color: black;
+width: 100%;
+}
+#logo {
+float: left;
+padding: 7px;
+}
+#menu {
+float: left;
+margin-left: 50px;
+padding: 7px;
+}
+#menu ul {
+margin: 0;
+padding: 0;
+list-style-type: none;
+}
+#menu ul li {
+float: left;
+padding: 5px;
+margin-right: 25px;
+text-align: center;
+color: grey;
+font-weight: bolder;
+}
+#menu ul li a {
+color: inherit;
+text-decoration: none;
+}
+#menu ul li:hover {
+color: white;
+font-weight: bolder;
+}
+#search {
+float: right;
+padding: 7px;
+}
+#search input[type=button] {
+background-color: lightseagreen;
+border: solid 1px lightseagreen;
+border-radius: 5px;
+height: 25px;
+padding-left: 15px;
+padding-right: 15px;
+color: white;
+}
+.separator {
+clear: both;
+}
+#content-container {
+width: 90%;
+margin:auto
+}
+/* ========================== */
+/* THUMBNAIL + GRADIENT       */
+/* ========================== */
+
+.thumbnail-hero {
+    width: 100%;
+    height: 420px;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 32px;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.thumbnail-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* GRADIENT CINEMATIC */
+.thumbnail-hero::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 45%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+}
+
+
+/* Bullet Navigation */
+.navigation {
+    position: absolute;
+    width: 100%;
+    bottom: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    z-index: 10;
+}
+.nav-btn {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    cursor: pointer;
+}
+.nav-btn:hover {
+    background: lightseagreen;
+    border-color: lightseagreen;
+}
+
+/* ARROWS */
+.arrow {
+    position: absolute;
+    top: 50%;
+    width: 48px;
+    height: 48px;
+    background-color: rgba(255,255,255,0.20);
+    backdrop-filter: blur(3px);
+    border-radius: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+}
+.arrow:hover {
+    background-color: rgba(255,255,255,0.35);
+}
+
+.arrow::after {
+    content: "";
+    border: solid white;
+    border-width: 0 4px 4px 0;
+    padding: 8px;
+    display: inline-block;
+    margin-left: 17px;
+    margin-top: 14px;
+}
+
+/* Left arrow */
+.left { left: 15px; }
+.left::after {
+    transform: rotate(135deg);
+    margin-left: 19px;
+}
+
+/* Right arrow */
+.right { right: 15px; }
+.right::after {
+    transform: rotate(-45deg);
+}
+
+
+/* ===================== */
+
+#description-container {
+margin-top: 32px;
+background-color: rgba(0, 0, 0, 0.8);
+border: solid 1px black;
+border-radius: 10px;
+padding: 10px;
+box-shadow: 5px 10px 18px black;
+}
+.movie-poster {
+width: 13%;
+float: left;
+}
+.description {
+width: 85%;
+float: left;
+padding-left: 13px;
+}
+.movie-title {
+margin: 0;
+padding: 0;
+font-family: Arial, Helvetica, Helvetica, sans-serif;
+font-size: 23px;
+font-weight: lighter;
+}
+.movie-details-list {
+list-style: none;
+padding: 0;
+margin: 10px 0;
+}
+.movie-details-list li {
+display: inline-block;
+margin-right: 15px;
+font-weight: bold;
+}
+.genre-tag {
+background-color: lightseagreen;
+padding: 3px 8px;
+border-radius: 5px;
+font-weight: normal;
+}
+
+/* === EPISODE LIST === */
+#episodes-container {
+    margin-top: 32px;
+    padding-bottom: 10px;
+}
+.episodes-title {
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    border-left: 4px solid lightseagreen;
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+.episode-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 15px;
+}
+.episode-item {
+    flex-shrink: 0;
+    width: 250px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.3s, transform 0.3s;
+    cursor: pointer;
+}
+.episode-item:hover {
+    background-color: #1a1a1a;
+    transform: translateY(-3px);
+}
+.episode-item a {
+    text-decoration: none;
+    color: white;
+    display: block;
+}
+.episode-thumbnail {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.episode-info p {
+    margin: 0;
+    line-height: 1.4;
+}
+.episode-info .ep-number {
+    font-weight: bold;
+    color: lightseagreen;
+}
+.episode-info .ep-title {
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+/* === MOVIE LIST === */
+#movie-list-header {
+margin-top: 32px;
+margin-bottom: 10px;
+border-bottom: solid 1px white;
+padding-bottom: 5px;
+font-size: large;
+font-weight: bold;
+}
+.movie-item {
+width: 135px;
+float: left;
+margin-top: 32px;
+margin-right: 23px;
+background-color: black;
+box-shadow: 5px 10px 18px black;
+position: relative;
+cursor: pointer;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+will-change: transform;
+transform: translateZ(0);
+}
+.movie-item:hover {
+transform: scale(1.1);
+z-index: 999;
+box-shadow: 0 0 15px 5px lightseagreen;
+}
+.movie-item img {
+width: 100%;
+border-radius: 5px;
+display: block;
+}
+.movie-item .title {
+background-color: white;
+color: black;
+text-align: center;
+width: 100%;
+border-radius: 5px;
+padding-top: 5px;
+padding-bottom: 5px;
+}
+.movie-item .title a {
+text-decoration: none;
+color: black;
+}
+.movie-item .title a:hover {
+color: lightseagreen;
+}
+
+#footer {
+background-color: black;
+text-align: center;
+padding: 20px;
+width: 100%;
+margin-top: 30px;
+}
+#footer p {
+margin: 5px 0;
+font-size: small;
+color: #aaa;
+}
+#footer a {
+color: lightseagreen;
+text-decoration: none;
+}
+#footer a:hover {
+text-decoration: underline;
+}
+</style>
+</head>
+
+<body>
+<div id="main-container">
+
+<div id="header">
+<div id="logo">
+<img src="img/bg7.png" height="120px">
+</div>
+<div id="menu">
+<ul>
+<li><a href="index.html">Home</a></li>
+<li><a href="moviespage.html">Movies</a></li>
+<li><a href="tvshowspage.html">Tv Shows</a></li>
+<li><a href="genre.html">Genre</a></li>
+</ul>
+</div>
+<div id="search">
+<form method="POST">
+<input type="text" name="keyword">
+<input type="button" value="Search">
+</form>
+</div>
+<div class="separator"></div>
+</div>
+
+<div id="content-container">
+
+<!-- ========================== -->
+<!-- THUMBNAIL TUNGGAL KEREN    -->
+<!-- ========================== -->
+
+<div class="thumbnail-hero">
+    <img src="image/movie/AVATAR2.jpg" alt="Thumbnail">
+</div>
+
+<!-- ========================== -->
+
+<div id="description-container">
+<img src="image/movie/Avatar.jpeg" class="movie-poster">
+<div class="description">
+<h4 class="movie-title">AVATAR: THE WAY OF WATER</h4>
+<p>Rated: 100 of 10 with 100.000 votes.</p>
+
+<ul class="movie-details-list">
+<li>Duration: <span class="genre-tag">192 min</span></li>
+<li>Genre:
+    <span class="genre-tag">Sci-Fi</span>
+    <span class="genre-tag">Action</span>
+    <span class="genre-tag">Adventure</span>
+</li>
+</ul>
+
+<p>
+Keluarga Jake Sully dan Neytiri terpaksa mengungsi dari hutan Pandora setelah manusia kembali mengancam. Mereka mencari perlindungan di klan Metkayina yang hidup di lautan dan harus belajar budaya baru yang berhubungan erat dengan air.
+</p>
+</div>
+<div class="separator"></div>
+</div>
+
+
+<div id="episodes-container">
+    <h3 class="episodes-title">Episodes</h3>
+    <ul class="episode-list">
+        <li class="episode-item">
+            <a href="episode1.html">
+                <img src="image/movie/ep1.webp" class="episode-thumbnail">
+                <div class="episode-info">
+                    <p class="ep-number">Eps 1</p>
+                    <p class="ep-title">The First Flight</p>
+                </div>
+            </a>
+        </li>
+
+        <li class="episode-item">
+            <a href="episode2.html">
+                <img src="image/movie/ep2.webp" class="episode-thumbnail">
+                <div class="episode-info">
+                    <p class="ep-number">Eps 2</p>
+                    <p class="ep-title">Secrets of the Deep</p>
+                </div>
+            </a>
+        </li>
+
+        <li class="episode-item">
+            <a href="episode3.html">
+                <img src="image/movie/ep3.webp" class="episode-thumbnail">
+                <div class="episode-info">
+                    <p class="ep-number">Eps 3</p>
+                </div>
+            </a>
+        </li>
+
+        <li class="episode-item">
+            <a href="episode4.html">
+                <img src="image/movie/ep4.webp" class="episode-thumbnail">
+                <div class="episode-info">
+                    <p class="ep-number">Eps 4</p>
+                    <p class="ep-title">The Fire Trial</p>
+                </div>
+            </a>
+        </li>
+
+        <li class="episode-item">
+            <a href="episode5.html">
+                <img src="image/movie/ep5.webp" class="episode-thumbnail">
+                <div class="episode-info">
+                    <p class="ep-number">Eps 5</p>
+                    <p class="ep-title">New Horizons</p>
+                </div>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+<div id="movie-list-header">
+<h3>Recommended Movies</h3>
+</div>
+
+<div id="movie-list-container">
+<div class="movie-item">
+    <a href="gemini.html"><img src="img/movie/ft9.webp"></a>
+<div class="title"><a href="gemini.html">Nobody 2</a></div>
+</div>
+<div class="movie-item">
+<a href="gemini.html"><img src="img/movie/m-3.jpg"></a>
+<div class="title"><a href="gemini.html">Godzilla VS Kong</a></div>
+</div>
+<div class="movie-item">
+<a href="gemini.html"><img src="img/movie/m-2.jpg"></a>
+<div class="title"><a href="gemini.html">Oppenheimer</a></div>
+</div>
+<div class="movie-item">
+<a href="gemini.html"><img src="img/movie/ft2.webp"></a>
+<div class="title"><a href="gemini.html">The Smashing Machine</a></div>
+</div>
+<div class="movie-item">
+<a href="gemini.html"><img src="img/movie/m12.jpg"></a>
+<div class="title"><a href="gemini.html">The Lord Of The Rings</a></div>
+</div>
+<div class="movie-item">
+<a href="gemini.html"><img src="img/movie/m9.jpg"></a>
+<div class="title"><a href="gemini.html">Shawshank Redemption</a></div>
+</div>
+<div class="movie-item">
+<a href="gemini.html"><img src="img/movie/m10.jpg"></a>
+<div class="title"><a href="gemini.html">Titanic</a></div>
+</div>
+</div>
+
+<div class="separator" style="margin-bottom: 50px;"></div>
+</div>
+
+<div id="footer">
+<p>&copy; 2025 MovieStream. All rights reserved.</p>
+<p>
+<a href="#">About Us</a> |
+<a href="#">Contact</a> |
+<a href="#">Privacy Policy</a>
+</p>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>HDLIX</title>
+    <style>
+        /* --- CSS INTI (TETAP) --- */
+        body {
+            background-image: url(img/bg.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: small;
+            color: white;
+        }
+        #main-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            margin: 0;
+            padding: 0;
+        }
+        #header { background-color: black; width: 100%; }
+        #logo { float: left; padding: 7px; }
+        #menu { float: left; margin-left: 50px; padding: 7px; }
+        #menu ul { margin: 0; padding: 0; list-style-type: none; }
+        
+        #menu ul li { 
+            float: left; 
+            padding: 5px; 
+            margin-right: 25px; 
+            text-align: center; 
+            color: grey; 
+            font-weight: bolder; 
+            font-size: 1.1em;
+        }
+        
+        #menu ul li a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        #menu ul li:hover { color: white; font-weight: bolder; cursor: pointer; }
+        
+        /* --- CSS Lainnya --- */
+        #search { float: right; padding: 7px; }
+        #search input[type=text] { height: 25px; border-radius: 5px; padding: 0 10px; border: none; }
+        #search input[type=submit] { background-color: lightseagreen; border: solid 1px lightseagreen; border-radius: 5px; height: 25px; padding-left: 15px; padding-right: 15px; color: white; cursor: pointer; }
+        .separator { clear: both; }
+        #content-container { width: 90%; margin:auto; padding-bottom: 50px; }
+        
+        /* === HEADLINE === */
+        #video-player { 
+            margin-top: 32px; 
+            border: solid 1px black; 
+            border-radius: 10px; 
+            padding: 10px; 
+            box-shadow: 5px 10px 18px black; 
+            height: 250px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative;
+            flex-direction: column; 
+            background-image: none; 
+            background-color: rgba(0, 0, 0, 0.9);
+            background-size: cover; 
+            background-position: center; 
+            padding: 0;
+        }
+
+        .main-category {
+            margin-top: 60px;
+            border-bottom: 5px solid lightseagreen; 
+            padding-bottom: 20px;
+        }
+        
+        .category-title {
+            font-size: 26px;
+            font-family: Arial, sans-serif;
+            border-left: 4px solid lightseagreen;
+            padding-left: 15px;
+            margin-bottom: 20px; 
+        }
+
+        /* --- GRID LAYOUT --- */
+        .movie-row-wrapper { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); 
+            gap: 20px; 
+            padding: 15px 0;
+            justify-content: start; 
+        }
+
+        /* === PERUBAHAN UTAMA: Membungkus .movie-item dengan <a> di HTML === */
+        
+        /* Parent <a> tag */
+        .movie-row-wrapper > a {
+            text-decoration: none;
+            color: inherit;
+            display: block; /* Penting: agar tautan bisa memegang div di dalamnya */
+            cursor: pointer;
+            
+            /* Menggunakan ini sebagai container untuk hover agar item tidak bergeser */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1; /* Z-index default */
+        }
+        
+        /* Efek saat HOVER pada <a> */
+        .movie-row-wrapper > a:hover {
+            transform: scale(1.05); /* Efek Membesar */
+            z-index: 5; /* Penting untuk tampil di atas item lain saat membesar */
+            box-shadow: 0 0 15px lightseagreen; /* Efek Bayangan */
+        }
+
+        /* Movie Item (sekarang berada di dalam <a>) */
+        .movie-item {
+            width: 100%; 
+            background-color: black;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 250px; 
+            
+            /* Hapus semua transisi dan shadow yang sudah dipindahkan ke <a> */
+            box-shadow: 5px 10px 18px black; /* Pertahankan shadow default */
+            transition: none;
+        }
+        
+        .movie-item img { 
+            width: 100%; 
+            height: calc(100% - 30px); /* Poster mengisi 250px dikurangi tinggi title */
+            object-fit: cover;
+            display: block;
+            border-radius: 5px 5px 0 0; 
+        }
+        
+        .movie-item .title { 
+            background-color: white; 
+            color: black; 
+            text-align: center; 
+            width: 100%; 
+            height: 30px;
+            position: absolute; 
+            bottom: 0;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 1.0em;
+            
+            /* Transisi untuk warna teks title saat hover */
+            transition: color 0.3s ease;
+        }
+
+        /* Ubah warna teks judul saat hover pada <a> */
+        .movie-row-wrapper > a:hover .title {
+            color: lightseagreen;
+        }
+
+        /* --- HIDDEN CLASS UNTUK PENCARIAN (TETAP) --- */
+        .movie-row-wrapper > a.hidden {
+            opacity: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            pointer-events: none;
+            visibility: hidden; 
+            display: none; 
+        }
+        
+        /* --- FOOTER --- */
+        #footer { width: 100%; background-color: #111; color: #aaa; text-align: center; padding: 20px 0; margin-top: 50px; font-size: 0.8em; }
+        #footer a { color: lightseagreen; text-decoration: none; }
+
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <div id="header">
+            <div id="logo">
+                <img src="img/bg7.png" height="120px" alt="Website Logo HDLIX"> 
+            </div>
+            <div id="menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="moviespage.html">Movies</a></li>
+                    <li><a href="tvshowpage.html">Tv Shows</a></li>
+                    <li><a href="genre.html">Genre</a></li>
+                </ul>
+            </div>
+            <div id="search">
+                <form id="searchForm" action="gemini.html" method="GET"> 
+                    <input type="text" name="keyword" id="searchInput" placeholder="Search for movies...">
+                    <input type="submit" value="Search"> 
+                </form>
+            </div>
+            <div class="separator"></div>
+        </div>
+        
+        <div id="content-container">
+
+            <div id="video-player">
+                <h1 style="font-size: 4.5em; margin: 10px 0; text-shadow: 2px 2px 4px #000; color: lightseagreen;">HDLIX</h1>
+                <p style="font-size: 1.5em; text-shadow: 2px 2px 4px #000; font-weight: 600;">Pilihan utama untuk hiburan Anda.</p>
+            </div>
+            <div class="separator"></div>
+            
+            <div class="main-category">
+                
+                <div class="movie-category" id="all-movies-category">
+                    <h2 class="category-title">Semua Film Populer</h2> 
+                    <div class="movie-row-container">
+
+                        <div class="movie-row-wrapper" id="all-movies-wrapper">
+                            
+                            <a href="Avatar.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/Avatar.jpeg" alt="Avatar: The Way Of Water">
+                                    <div class="title">Avatar: The Way Of Water</div>
+                                </div>
+                            </a>
+
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/Fight Club.jpeg" alt="Fight Club">
+                                    <div class="title">Fight Club</div>
+                                </div>
+                            </a>
+
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/Inception.jpg" alt="Inception">
+                                    <div class="title">Inception</div>
+                                </div>
+                            </a>
+
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/Pulp Fiction.jpg" alt="Pulp Fiction">
+                                    <div class="title">Pulp Fiction</div>
+                                </div>
+                            </a>
+
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/SchindlersList.jpg" alt="Schindler's List">
+                                    <div class="title">SchindlersList</div>
+                                </div>
+                            </a>
+                            
+                            <a href="Avatar.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/TheGodFather Part II.jpg" alt="The GodFather Part II">
+                                    <div class="title">TheGodFather Part II</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m7.jpg" alt="The Dark Knight">
+                                    <div class="title">The Dark Knight</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m8.jpg" alt="The God Father">
+                                    <div class="title">The God Father</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m9.jpg" alt="Shawshank Redemption">
+                                    <div class="title">Shawshank Redemption</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m10.jpg" alt="Titanic">
+                                    <div class="title">Titanic</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m11.jpg" alt="Rurouni Kenshin">
+                                    <div class="title">Rurouni Kenshin</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m12.jpg" alt="The Lord Of The Rings">
+                                    <div class="title">The Lord Of The Rings</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-1.jpg" alt="Tron Ares">
+                                    <div class="title">Tron Ares</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-2.jpg" alt="Oppenheimer">
+                                    <div class="title">Oppenheimer</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-3.jpg" alt="Godzilla VS Kong">
+                                    <div class="title">Godzilla VS Kong</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-5.jpg" alt="The Flash">
+                                    <div class="title">The Flash</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-6.jpg" alt="Captain America: Brave New World">
+                                    <div class="title">Captain America: Brave New World</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-7.jpg" alt="Extraction 2">
+                                    <div class="title">Extraction 2</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-8.jpg" alt="The Kingsman">
+                                    <div class="title">The Kingsman</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-9.jpg" alt="Equalizer 3">
+                                    <div class="title">Equalizer 3</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-10.jpg" alt="High and Low">
+                                    <div class="title">High and Low</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/m-11.jpg" alt="Venom: The Last Dance">
+                                    <div class="title">Venom: The Last Dance</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft1.webp" alt="Lone Samurai">
+                                    <div class="title">Lone Samurai</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft2.webp" alt="The Smashing Machine">
+                                    <div class="title">The Smashing Machine</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft3.webp" alt="The Conjouring: Last Bites">
+                                    <div class="title">The Conjouring: Last Bites</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft4.webp" alt="Roofman">
+                                    <div class="title">Roofman</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft5.webp" alt="The Shadow's Edge">
+                                    <div class="title">The Shadow's Edge</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft6.webp" alt="The Long Walk">
+                                    <div class="title">The Long Walk</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft7.webp" alt="Dog Patrol: Operation Santa Paws">
+                                    <div class="title">Dog Patrol: Operation Santa Paws</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft8.webp" alt="Black Phone 2">
+                                    <div class="title">Black Phone 2</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft9.webp" alt="Nobody 2">
+                                    <div class="title">Nobody 2</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft10.webp" alt="The Fantastic 4: First Steps">
+                                    <div class="title">The Fantastic 4: First Steps</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft11.webp" alt="The Naked Gun">
+                                    <div class="title">The Naked Gun</div>
+                                </div>
+                            </a>
+                            <a href="gemini.html">
+                                <div class="movie-item">
+                                    <img src="img/movie/ft12.webp" alt="Palestine 36">
+                                    <div class="title">Palestine 36</div>
+                                </div>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="footer">
+            <p>&copy; 2025 HDLIX. All Rights Reserved. Designed by <a href="#">Prasetyo</a></p>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * Fungsi PENCARIAN (LOCAL SEARCH) dengan EFEK TRANSISI.
+         * Perlu sedikit penyesuaian untuk menargetkan tag <a> yang baru.
+         */
+        function filterMovies(keyword) {
+            const wrapper = document.getElementById('all-movies-wrapper');
+            if (!wrapper) return; 
+            
+            // Sekarang menargetkan tag <a> langsung, bukan .movie-item
+            const items = wrapper.querySelectorAll('.movie-row-wrapper > a');
+            const lowerCaseKeyword = keyword.toLowerCase().trim();
+            let visibleCount = 0;
+
+            items.forEach(item => {
+                // Mencari teks judul di dalam <a>
+                const titleText = item.querySelector('.title').textContent.trim().toLowerCase();
+                
+                if (titleText.includes(lowerCaseKeyword)) {
+                    item.classList.remove('hidden'); 
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden'); 
+                }
+            });
+
+            // Mengelola tampilan judul kategori (opsional, tapi bagus untuk UX)
+            const categoryTitle = document.querySelector('#all-movies-category .category-title');
+            if (categoryTitle) {
+                if (lowerCaseKeyword.length > 0) {
+                    categoryTitle.textContent = visibleCount > 0 ? `Hasil Pencarian (${visibleCount})` : "Tidak ditemukan hasil.";
+                } else {
+                    categoryTitle.textContent = "Semua Film Populer";
+                }
+            }
+        }
+
+        // Panggil saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+
+            // 1. Event Listener untuk Submit/Tombol Search
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault(); 
+                const keyword = searchInput.value;
+                filterMovies(keyword);
+            });
+            
+            // 2. Listener untuk mereset tampilan saat input diketik/dikosongkan
+            searchInput.addEventListener('keyup', function() {
+                setTimeout(() => {
+                    const keyword = searchInput.value;
+                    filterMovies(keyword);
+                }, 300); 
+            });
+            
+            // 3. Menangani jika ada keyword dari URL (jika halaman ini diakses dari luar)
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialKeyword = urlParams.get('keyword');
+            if (initialKeyword) {
+                searchInput.value = initialKeyword;
+                filterMovies(initialKeyword);
+            }
+        });
+
+    </script>
+    
+</body>
+</html>

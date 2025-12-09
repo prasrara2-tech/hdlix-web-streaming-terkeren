@@ -1,0 +1,515 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>HDLIX</title>
+    <style>
+        /* --- CSS INTI (TETAP) --- */
+        body {
+            background-image: url(img/bg.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: small;
+            color: white;
+        }
+        #main-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            margin: 0;
+            padding: 0;
+        }
+        #header { background-color: black; width: 100%; }
+        #logo { float: left; padding: 7px; }
+        #menu { float: left; margin-left: 50px; padding: 7px; }
+        #menu ul { margin: 0; padding: 0; list-style-type: none; }
+        
+        #menu ul li { 
+            float: left; 
+            padding: 5px; 
+            margin-right: 25px; 
+            text-align: center; 
+            color: grey; 
+            font-weight: bolder; 
+            font-size: 1.1em;
+        }
+        
+        #menu ul li a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        #menu ul li:hover { color: white; font-weight: bolder; cursor: pointer; }
+        
+        /* --- CSS Lainnya (DIPERTAHINKAN) --- */
+        #search { float: right; padding: 7px; }
+        #search input[type=text] { height: 25px; border-radius: 5px; padding: 0 10px; border: none; }
+        #search input[type=button] { background-color: lightseagreen; border: solid 1px lightseagreen; border-radius: 5px; height: 25px; padding-left: 15px; padding-right: 15px; color: white; cursor: pointer; }
+        .separator { clear: both; }
+        #content-container { width: 90%; margin:auto; padding-bottom: 50px; }
+        
+        /* === HEADLINE === */
+        #video-player { 
+            margin-top: 32px; 
+            border: solid 1px black; 
+            border-radius: 10px; 
+            box-shadow: 5px 10px 18px black; 
+            height: 250px;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative;
+            flex-direction: column; 
+            
+            background-image: none; 
+            background-color: rgba(0, 0, 0, 0.9);
+            background-size: cover; 
+            background-position: center; 
+            padding: 0;
+        }
+        
+        /* Gaya Teks Headline Baru */
+        .headline-hdlix {
+            font-size: 4.5em; 
+            margin: 10px 0; 
+            text-shadow: 2px 2px 4px #000; 
+            color: lightseagreen;
+        }
+        .headline-slogan {
+            font-size: 1.5em; 
+            text-shadow: 2px 2px 4px #000; 
+            font-weight: 600;
+        }
+
+        .main-category {
+            margin-top: 60px;
+            padding-bottom: 20px;
+        }
+        
+        /* Font Size Genre/Category Title */
+        .category-title {
+            font-size: 26px;
+            font-family: Arial, sans-serif;
+            border-left: 4px solid lightseagreen;
+            padding-left: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .movie-category {
+            margin-top: 40px; 
+            position: relative;
+        }
+
+        /* --- CSS untuk Efek Slide (HORIZONTAL SCROLL) --- */
+        .movie-row-container {
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .movie-row-wrapper { 
+            display: flex; 
+            overflow-x: scroll;
+            /* Menyembunyikan scrollbar */
+            &::-webkit-scrollbar { display: none; }
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            
+            padding: 15px 0;
+            gap: 20px; 
+            scroll-behavior: smooth; 
+        }
+
+        .movie-item {
+            width: 135px;
+            flex-shrink: 0; 
+            
+            margin-top: 5px; 
+            background-color: black;
+            box-shadow: 5px 10px 18px black;
+            position: relative;
+            /* Transisi untuk efek hover */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border-radius: 5px; /* Tambahkan border-radius ke item utama */
+        }
+        
+        /* Efek hover yang diminta: membesar dan bayangan lebih tegas */
+        .movie-item:hover {
+            transform: scale(1.05); /* Memperbesar sedikit */
+            box-shadow: 0 0 25px lightseagreen; /* Bayangan bersinar */
+            z-index: 15; /* Pastikan movie-item yang dihover berada di atas */
+            cursor: pointer; /* Menambahkan indikator klik pada item */
+        }
+
+        /* Tautan di dalam movie-item */
+        .movie-item a {
+            text-decoration: none; /* Hapus garis bawah dari tautan */
+            color: white; /* Atur warna default untuk teks di dalam tautan (override default browser) */
+            display: block; /* Pastikan tautan menempati seluruh area .movie-item */
+        }
+        
+        .movie-item img { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover;
+            border-radius: 5px 5px 0 0; /* Ubah border-radius agar judul tidak ikut rounded */
+            background-color: #333; 
+            /* Transisi untuk gambar saat hover */
+            transition: border 0.3s;
+        }
+        
+        .movie-item:hover img {
+            border: 1px solid lightseagreen; /* Border saat hover pada gambar */
+        }
+        
+        .movie-item .title { 
+            background-color: white; 
+            color: black; 
+            text-align: center; 
+            width: 100%; 
+            border-radius: 0 0 5px 5px; 
+            padding-top: 5px; 
+            padding-bottom: 5px;
+            font-size: 1.0em; /* Font Size Judul Film */
+            font-weight: 600; /* Sedikit lebih tebal agar terlihat seperti tautan */
+        }
+        
+        /* Hapus gaya ini karena tautan sudah membungkus semua */
+        /* .movie-item .title a { text-decoration: none; color: black; font-size: 1.0em; font-weight: 500; } */
+        
+        /* --- CSS untuk Tombol Slide --- */
+        .slide-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(calc(-50% + 15px)); /* Sesuaikan posisi vertikal agar di tengah wrapper yang memiliki padding 15px di atas/bawah */
+            width: 50px;
+            height: calc(100% - 30px); /* 100% tinggi wrapper dikurangi padding 15px * 2 */
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            padding: 0;
+        }
+
+        .slide-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .slide-button-prev {
+            left: 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .slide-button-next {
+            right: 0;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .slide-button[style*="display: none"] {
+            display: none !important;
+        }
+        
+        /* --- FOOTER --- */
+        #footer { width: 100%; background-color: #111; color: #aaa; text-align: center; padding: 20px 0; margin-top: 50px; font-size: 0.8em; }
+        #footer a { color: lightseagreen; text-decoration: none; }
+
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <div id="header">
+            <div id="logo">
+                <img src="img/bg7.png" height="120px" alt="Website Logo HDLIX"> 
+            </div>
+            <div id="menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="moviespage.html">Movies</a></li>
+                    <li><a href="tvshowpage.html">Tv Shows</a></li>
+                    <li><a href="genre.html">Genre</a></li>
+                </ul>
+            </div>
+            <div id="search">
+                <form method="POST">
+                    <input type="text" name="keyword" id="searchInput" placeholder="Search for movies...">
+                    <input type="button" value="Search">
+                </form>
+            </div>
+            <div class="separator"></div>
+        </div>
+        
+        <div id="content-container">
+
+            <div id="video-player">
+                <h1 class="headline-hdlix">HDLIX</h1>
+                <p class="headline-slogan">Pilihan utama untuk hiburan Anda.</p>
+            </div>
+            <div class="separator"></div>
+            
+            <div class="main-category">
+                
+                <div class="movie-category" id="aksi-petualangan-category">
+                    <h2 class="category-title">Aksi & Petualangan (Action & Adventure)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="aksi-petualangan-prev" onclick="scrollMovies('aksi-petualangan-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="aksi-petualangan-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/1.webp" alt="Jalan Berdarah"><div class="title">Jalan Berdarah</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/2.webp" alt="Extraction 2"><div class="title">Extraction 2</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/3.webp" alt="Equalizer 3"><div class="title">Equalizer 3</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/4.webp" alt="Jelajah Hutan"><div class="title">Jelajah Hutan</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/5.webp" alt="Pirates of the Caribbean"><div class="title">Pirates of the Caribbean</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/6.webp" alt="Lone Samurai"><div class="title">Lone Samurai</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/7.webp" alt="Indiana Jones"><div class="title">Indiana Jones</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/8.webp" alt="Tron Ares"><div class="title">Tron Ares</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="aksi-petualangan-next" onclick="scrollMovies('aksi-petualangan-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                <div class="movie-category" id="komedi-category">
+                    <h2 class="category-title">Komedi (Comedy)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="komedi-prev" onclick="scrollMovies('komedi-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="komedi-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/9.webp" alt="Gila Hormat"><div class="title">Gila Hormat</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/10.webp" alt="Pesta Kampus"><div class="title">Pesta Kampus</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/11.webp" alt="The Naked Gun"><div class="title">The Naked Gun</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/12.webp" alt="Mantan Terindah"><div class="title">Mantan Terindah</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/13.webp" alt="Tukang Ojek Pengkolan"><div class="title">Tukang Ojek Pengkolan</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/14.webp" alt="Keluarga Cemara"><div class="title">Keluarga Cemara</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/15.webp" alt="My Stupid Boss"><div class="title">My Stupid Boss</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/16.webp" alt="Up (2009)"><div class="title">Up (2009)</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="komedi-next" onclick="scrollMovies('komedi-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+                
+                <div class="movie-category" id="drama-romantis-category">
+                    <h2 class="category-title">Drama & Romantis (Drama & Romance)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="drama-romantis-prev" onclick="scrollMovies('drama-romantis-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="drama-romantis-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/17.webp" alt="Hati yang Hancur"><div class="title">Hati yang Hancur</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/18.webp" alt="Senja di Pelukan"><div class="title">Senja di Pelukan</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/19.webp" alt="Titanic"><div class="title">Titanic</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/20.webp" alt="The Manipulated"><div class="title">The Manipulated</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/21.webp" alt="Janji Setia"><div class="title">Janji Setia</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/22.webp" alt="Cinta Pertama"><div class="title">Cinta Pertama</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/23.webp" alt="Twelve"><div class="title">Twelve</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/24.webp" alt="Dua Garis Biru"><div class="title">Dua Garis Biru</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="drama-romantis-next" onclick="scrollMovies('drama-romantis-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+                
+                <div class="movie-category" id="horor-misteri-category">
+                    <h2 class="category-title">Horor & Misteri (Horror & Mystery)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="horor-misteri-prev" onclick="scrollMovies('horor-misteri-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="horor-misteri-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/25.webp" alt="Rumah Berhantu"><div class="title">Rumah Berhantu</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/movie/ft3.webp" alt="The Conjouring: Last Bites"><div class="title">The Conjouring: Last Bites</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/26.webp" alt="Penyelidikan"><div class="title">Penyelidikan</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/27.webp" alt="KKN di Desa Penari"><div class="title">KKN di Desa Penari</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/28.webp" alt="Sherlock Holmes"><div class="title">Sherlock Holmes</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/29.webp" alt="Pengabdi Setan"><div class="title">Pengabdi Setan</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/32.webp" alt="Gone Girl"><div class="title">Gone Girl</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/31.webp" alt="Pembunuhan"><div class="title">Pembunuhan</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="horor-misteri-next" onclick="scrollMovies('horor-misteri-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                <div class="movie-category" id="scifi-fantasi-category">
+                    <h2 class="category-title">Fiksi Ilmiah & Fantasi (Sci-Fi & Fantasy)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="scifi-fantasi-prev" onclick="scrollMovies('scifi-fantasi-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="scifi-fantasi-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/32.webp" alt="Planet Alpha"><div class="title">Planet Alpha</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/33.webp" alt="Interstellar"><div class="title">Interstellar</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/34.webp" alt="Dunia Sihir"><div class="title">Dunia Sihir</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/35.webp" alt="Inception"><div class="title">Inception</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/36.webp" alt="Black Knight"><div class="title">Black Knight</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/37.webp" alt="The Lord Of The Rings"><div class="title">The Lord Of The Rings</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/38.webp" alt="Harry Potter"><div class="title">Harry Potter</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/39.webp" alt="Avatar"><div class="title">Avatar</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="scifi-fantasi-next" onclick="scrollMovies('scifi-fantasi-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                <div class="movie-category" id="thriller-kriminal-category">
+                    <h2 class="category-title">Thriller & Kriminal (Thriller & Crime)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="thriller-kriminal-prev" onclick="scrollMovies('thriller-kriminal-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="thriller-kriminal-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/40.webp" alt="Penculikan"><div class="title">Penculikan</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/41.webp" alt="Seven"><div class="title">Seven</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/42.webp" alt="Rencana Hebat"><div class="title">Rencana Hebat</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/43.webp" alt="The GodFather Part II"><div class="title">The GodFather Part II</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/44.webp" alt="The Veil"><div class="title">The Veil</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/45.webp" alt="The Worst Of Evil"><div class="title">The Worst Of Evil</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/46.webp" alt="The God Father"><div class="title">The God Father</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/47.webp" alt="Money Heist"><div class="title">Money Heist</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="thriller-kriminal-next" onclick="scrollMovies('thriller-kriminal-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                <div class="movie-category" id="animasi-keluarga-category">
+                    <h2 class="category-title">Animasi & Keluarga (Animation & Family)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="animasi-keluarga-prev" onclick="scrollMovies('animasi-keluarga-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="animasi-keluarga-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/56.webp" alt="Dunia Kartun"><div class="title">Dunia Kartun</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/49.webp" alt="Home Alone"><div class="title">Home Alone</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/50.webp" alt="Toy Story"><div class="title">Toy Story</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/51.webp" alt="Liburan Keluarga"><div class="title">Liburan Keluarga</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/52.webp" alt="Finding Nemo"><div class="title">Finding Nemo</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/53.webp" alt="Matilda"><div class="title">Matilda</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/54.webp" alt="Frozen"><div class="title">Frozen</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/55.webp" alt="Dog Patrol"><div class="title">Dog Patrol</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="animasi-keluarga-next" onclick="scrollMovies('animasi-keluarga-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                <div class="movie-category" id="dokumenter-sejarah-category">
+                    <h2 class="category-title">Dokumenter & Sejarah (Documentary & History)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button slide-button-prev" id="dokumenter-sejarah-prev" onclick="scrollMovies('dokumenter-sejarah-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="dokumenter-sejarah-row-wrapper">
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/61.webp" alt="Alam Liar"><div class="title">Alam Liar</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/62.webp" alt="Dunkirk"><div class="title">Dunkirk</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/movie/SchindlersList.jpg" alt="Schindler's List"><div class="title">Schindler's List</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/movie/m-2.jpg" alt="Oppenheimer"><div class="title">Oppenheimer</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/58.webp" alt="Planet Earth"><div class="title">Planet Earth</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/movie/ft12.webp" alt="Palestine 36"><div class="title">Palestine 36</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/59.webp" alt="My Octopus Teacher"><div class="title">My Octopus Teacher</div></a></div>
+                            <div class="movie-item"><a href="gemini.html"><img src="image/genre/60.webp" alt="Saving Private Ryan"><div class="title">Saving Private Ryan</div></a></div>
+                        </div>
+
+                        <button class="slide-button slide-button-next" id="dokumenter-sejarah-next" onclick="scrollMovies('dokumenter-sejarah-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                </div>
+        </div>
+
+        <div id="footer">
+            <p>&copy; 2025 HDLIX. All Rights Reserved. Designed by <a href="#">Prasetyo</a></p>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * Fungsi utama untuk menggulir baris film secara horizontal.
+         */
+        function scrollMovies(wrapperId, distance) {
+            const wrapper = document.getElementById(wrapperId);
+            
+            if (wrapper) {
+                wrapper.scrollBy({
+                    left: distance,
+                    behavior: 'smooth'
+                });
+                
+                setTimeout(() => {
+                    updateSlideButtons(wrapperId);
+                }, 500); 
+            }
+        }
+
+        /**
+         * Fungsi untuk menampilkan atau menyembunyikan tombol prev/next berdasarkan posisi scroll.
+         */
+        function updateSlideButtons(wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+            if (!wrapper) return;
+
+            const categoryName = wrapperId.replace('-row-wrapper', '');
+            const prevButton = document.getElementById(categoryName + '-prev');
+            const nextButton = document.getElementById(categoryName + '-next');
+
+            const scrollLeft = wrapper.scrollLeft;
+            const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+
+            if (prevButton) {
+                // Sembunyikan tombol kiri jika sudah di awal
+                if (scrollLeft < 20) {
+                    prevButton.style.display = 'none';
+                } else {
+                    prevButton.style.display = 'flex';
+                }
+            }
+
+            if (nextButton) {
+                if (wrapper.scrollWidth <= wrapper.clientWidth) {
+                    // Sembunyikan jika konten tidak melebihi lebar kontainer
+                    if (prevButton) prevButton.style.display = 'none';
+                    nextButton.style.display = 'none';
+                } else if (scrollLeft >= maxScroll - 20) {
+                    // Sembunyikan tombol kanan jika sudah di akhir
+                    nextButton.style.display = 'none';
+                } else {
+                    nextButton.style.display = 'flex';
+                }
+            }
+        }
+        
+        // Panggil saat halaman dimuat untuk inisialisasi tombol
+        document.addEventListener('DOMContentLoaded', () => {
+            // Daftar 8 wrapper ID yang baru
+            const wrappers = [
+                'aksi-petualangan-row-wrapper', 
+                'komedi-row-wrapper', 
+                'drama-romantis-row-wrapper', 
+                'horor-misteri-row-wrapper', 
+                'scifi-fantasi-row-wrapper', 
+                'thriller-kriminal-row-wrapper', 
+                'animasi-keluarga-row-wrapper', 
+                'dokumenter-sejarah-row-wrapper'
+            ];
+            
+            wrappers.forEach(id => {
+                updateSlideButtons(id);
+                
+                const wrapper = document.getElementById(id);
+                if (wrapper) {
+                    wrapper.addEventListener('scroll', () => updateSlideButtons(id));
+                }
+            });
+            
+            // Tambahkan event listener untuk resize window
+            window.addEventListener('resize', () => {
+                wrappers.forEach(id => updateSlideButtons(id));
+            });
+        });
+
+    </script>
+    
+</body>
+</html>

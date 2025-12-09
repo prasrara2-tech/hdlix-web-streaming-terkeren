@@ -1,0 +1,319 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Website Layout</title>
+<style>
+body {
+background-image: url(img/bg.jpg);
+background-repeat: no-repeat;
+background-size: cover;
+background-attachment: fixed;
+font-family: Verdana, Geneva, Tahoma, sans-serif;
+font-size: small;
+}
+#main-container {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+background-color: rgba(0, 0, 0, 0.6);
+color: white;
+margin: 0;
+padding: 0;
+}
+#header {
+background-color: black;
+width: 100%;
+}
+#logo {
+float: left;
+padding: 7px;
+}
+#menu {
+float: left;
+margin-left: 50px;
+padding: 7px;
+}
+#menu ul {
+margin: 0;
+padding: 0;
+list-style-type: none;
+}
+#menu ul li {
+float: left;
+padding: 5px;
+margin-right: 25px;
+text-align: center;
+color: grey;
+font-weight: bolder;
+}
+#menu ul li a { /* Style untuk link di dalam menu */
+color: inherit;
+text-decoration: none;
+}
+#menu ul li:hover {
+color: white;
+font-weight: bolder;
+}
+#search {
+float: right;
+padding: 7px;
+}
+#search input[type=button] {
+background-color: lightseagreen;
+border: solid 1px lightseagreen;
+border-radius: 5px;
+height: 25px;
+padding-left: 15px;
+padding-right: 15px;
+color: white;
+}
+.separator {
+clear: both;
+}
+#content-container {
+width: 90%;
+margin:auto
+}
+#video-player {
+margin-top: 32px;
+background-color: black;
+border: solid 1px black;
+border-radius: 10px;
+padding: 10px;
+box-shadow: 5px 10px 18px black;
+}
+#description-container {
+margin-top: 32px;
+background-color: rgba(0, 0, 0, 0.8);
+border: solid 1px black;
+border-radius: 10px;
+padding: 10px;
+box-shadow: 5px 10px 18px black;
+}
+.movie-poster {
+width: 13%;
+float: left;
+}
+.description {
+width: 85%;
+float: left;
+padding-left: 13px;
+}
+.movie-title {
+margin: 0;
+padding: 0;
+font-family: Arial, Helvetica, Helvetica, sans-serif;
+font-size: 23px;
+font-weight: lighter;
+}
+/* NEW CSS for Genre and Duration */
+.movie-details-list {
+list-style: none;
+padding: 0;
+margin: 10px 0;
+}
+.movie-details-list li {
+display: inline-block;
+margin-right: 15px;
+font-weight: bold;
+}
+.genre-tag {
+background-color: lightseagreen;
+padding: 3px 8px;
+border-radius: 5px;
+font-weight: normal;
+}
+/* End NEW CSS */
+
+#movie-list-header {
+margin-top: 32px;
+margin-bottom: 10px;
+border-bottom: solid 1px white;
+padding-bottom: 5px;
+font-size: large;
+font-weight: bold;
+}
+#movie-list-container {
+width: 100%;
+}
+.movie-item {
+width: 135px;
+float: left;
+margin-top: 32px;
+margin-right: 23px;
+background-color: black;
+box-shadow: 5px 10px 18px black;
+/* PENTING 1: Posisi relatif diperlukan agar z-index bekerja */
+position: relative; 
+cursor: pointer;
+/* TAMBAH: Transisi untuk efek HOVER yang halus */
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* PENTING 2: Memicu rendering GPU untuk Transformasi yang lancar */
+will-change: transform; 
+transform: translateZ(0); 
+}
+
+/* KOREKSI UTAMA: EFEK SAAT MOUSE DIARAHKAN (HOVER) */
+.movie-item:hover {
+    /* Pembesaran */
+    transform: scale(1.1); 
+    /* Z-index tinggi untuk memastikan item muncul di atas yang lain */
+    z-index: 999; 
+    /* Bayangan Aksen */
+    box-shadow: 0 0 15px 5px lightseagreen; 
+}
+
+/* Memastikan gambar dan tautan di dalamnya diatur dengan benar */
+.movie-item a {
+    display: block; 
+}
+.movie-item img {
+width: 100%;
+border-radius: 5px;
+display: block; 
+}
+.movie-item .title {
+background-color: white;
+color: black;
+text-align: center;
+width: 100%;
+border-radius: 5px;
+padding-top: 5px;
+padding-bottom: 5px;
+}
+.movie-item .title a {
+text-decoration: none;
+color: black;
+}
+/* KOREKSI: Efek HOVER pada link judul */
+.movie-item .title a:hover {
+    text-decoration: none; 
+    color: lightseagreen; 
+}
+#footer {
+background-color: black;
+text-align: center;
+padding: 20px;
+width: 100%;
+margin-top: 30px;
+}
+#footer p {
+margin: 5px 0;
+font-size: small;
+color: #aaa;
+}
+#footer a {
+color: lightseagreen;
+text-decoration: none;
+}
+#footer a:hover {
+text-decoration: underline;
+}
+</style>
+</head>
+
+<body>
+<div id="main-container">
+<div id="header">
+<div id="logo">
+<img src="img/bg7.png"
+height="120px">
+</div>
+<div id="menu">
+<ul>
+<li><a href="index.html">Home</a></li>
+<li><a href="moviespage.html">Movies</a></li>
+<li><a href="tvshowspage.html">Tv Shows</a></li>
+<li><a href="genre.html">Genre</a></li>
+</ul>
+</div>
+<div id="search">
+<form method="POST">
+<input type="text" name="keyword">
+<input type="button" value="Search">
+</form>
+</div>
+<div class="separator"></div>
+</div>
+<div id="content-container">
+<div id="video-player">
+<video width="100%" controls>
+<source src="img/movie/Gugur Bunga.mp4"
+type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+<div id="description-container">
+<img src="img/movie/Avatar.jpeg"
+class="movie-poster">
+<div class="description">
+<h4 class="movie-title">
+AVATAR: THE WAY OF WATER
+</h4>
+<p>
+Rated: 100 of 10 with 100.000votes.
+</p>
+<ul class="movie-details-list">
+<li>
+Duration: <span class="genre-tag">192 min</span>
+</li>
+<li>
+Genre: <span class="genre-tag">Sci-Fi</span>,
+<span class="genre-tag">Action</span>,
+<span class="genre-tag">Adventure</span>
+</li>
+</ul>
+<p>
+keluarga Jake Sully dan Neytiri yang terpaksa mengungsi dari hutan Pandora setelah ancaman lama dari manusia kembali. Untuk melindungi diri, mereka meninggalkan rumah mereka dan mencari perlindungan di klan Metkayina, suku Na'vi yang hidup di lautan, di mana mereka harus belajar menyesuaikan diri dengan budaya dan cara hidup baru yang berhubungan erat dengan air.
+</p>
+</div>
+<div class="separator"></div>
+</div>
+<div id="movie-list-header">
+<h3>Recommended Movies</h3>
+</div>
+<div id="movie-list-container">
+ <div class="movie-item">
+ <a href="gemini.html"><img src="img/movie/ft9.webp"></a>
+<div class="title"><a href="gemini.html">Nobody 2</a></div>
+ </div>
+<div class="movie-item">
+ <a href="gemini.html"><img src="img/movie/m-3.jpg"></a>
+<div class="title"><a href="gemini.html">Godzilla VS Kong</a></div>
+ </div>
+<div class="movie-item">
+ <a href="gemini.html"><img src="img/movie/m-2.jpg"></a>
+ <div class="title"><a href="gemini.html">Oppenheimer</a></div>
+ </div>
+ <div class="movie-item">
+<a href="gemini.html"><img src="img/movie/ft2.webp"></a>
+ <div class="title"><a href="gemini.html">The Smashing Machine</a></div>
+ </div>
+ <div class="movie-item">
+<a href="gemini.html"><img src="img/movie/m12.jpg"></a>
+ <div class="title"><a href="gemini.html">The Lord Of The Rings</a></div>
+ </div>
+<div class="movie-item">
+<a href="gemini.html"><img src="img/movie/m9.jpg"></a>
+<div class="title"><a href="gemini.html">Shawshank Redemption</a></div>
+ </div>
+<div class="movie-item">
+ <a href="gemini.html"><img src="img/movie/m10.jpg"></a>
+ <div class="title"><a href="gemini.html">Titanic</a></div>
+ </div>
+</div>
+<div class="separator" style="margin-bottom: 50px;">
+</div>
+</div>
+<div id="footer">
+<p>&copy; 2025 MovieStream. All rights reserved.</p>
+<p>
+<a href="#">About Us</a> |
+<a href="#">Contact</a> |
+<a href="#">Privacy Policy</a>
+</p>
+</div>
+</div>
+</body>
+</html>

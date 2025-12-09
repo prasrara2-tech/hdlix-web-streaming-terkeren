@@ -1,0 +1,749 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>HDLIX</title>
+    <style>
+        /* CSS yang sudah ada dipertahankan */
+        body {
+            background-image: url(img/bg.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: small;
+            color: white;
+        }
+        #main-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            margin: 0;
+            padding: 0;
+        }
+        #header { background-color: black; width: 100%; }
+        #logo { float: left; padding: 7px; }
+        #menu { float: left; margin-left: 50px; padding: 7px; }
+        #menu ul { margin: 0; padding: 0; list-style-type: none; }
+        
+        #menu ul li { 
+            float: left; 
+            padding: 5px; 
+            margin-right: 25px; 
+            text-align: center; 
+            color: grey; 
+            font-weight: bolder; 
+            font-size: 1.1em;
+        }
+        
+        #menu ul li a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        #menu ul li:hover { color: white; font-weight: bolder; cursor: pointer; }
+        
+        #search { float: right; padding: 7px; }
+        #search input[type=text] { height: 25px; border-radius: 5px; padding: 0 10px; border: none; }
+        #search input[type=submit] { background-color: lightseagreen; border: solid 1px lightseagreen; border-radius: 5px; height: 25px; padding-left: 15px; padding-right: 15px; color: white; cursor: pointer; }
+        .separator { clear: both; }
+        #content-container { width: 90%; margin:auto; padding-bottom: 50px; }
+        #video-player { 
+            margin-top: 32px; 
+            background-color: black; 
+            border: solid 1px black; 
+            border-radius: 10px; 
+            padding: 10px; 
+            box-shadow: 5px 10px 18px black; 
+            height: 450px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative;
+            flex-direction: column; 
+            background-image: url(img/bg5.jpg); 
+            background-size: cover; 
+            background-position: center; 
+            padding: 0;
+        }
+
+        .main-category {
+            margin-top: 60px;
+            border-bottom: 5px solid lightseagreen; 
+            padding-bottom: 20px;
+        }
+        .main-category-title {
+            font-size: 38px;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 10px;
+            background-color: #000;
+        }
+
+        .movie-category {
+            margin-top: 40px;
+            position: relative; 
+            transition: opacity 0.5s ease; 
+        }
+        
+        .category-title {
+            font-size: 26px;
+            font-family: Arial, sans-serif;
+            border-left: 4px solid lightseagreen;
+            padding-left: 15px;
+            margin-bottom: 10px;
+        }
+
+        /* --- CSS untuk Efek Slide/Hover dan Transisi --- */
+        .movie-row-container {
+            position: relative; 
+            overflow: hidden; 
+        }
+
+        .movie-row-wrapper { 
+            display: flex; 
+            overflow-x: scroll;
+            &::-webkit-scrollbar {
+                display: none;
+            }
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            
+            padding: 15px 0;
+            gap: 20px; 
+            scroll-behavior: smooth; 
+        }
+        
+        .movie-item {
+            width: 135px;
+            flex-shrink: 0; 
+            margin-top: 5px; 
+            background-color: black;
+            box-shadow: 5px 10px 18px black;
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            
+            /* BARU: Transisi untuk transform, box-shadow, opacity, dan margin */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease, height 0.5s ease, margin 0.5s ease, padding 0.5s ease;
+            
+            /* Tentukan tinggi item film agar transisi height bekerja */
+            height: 250px; 
+            opacity: 1; 
+        }
+        
+        /* BARU: Kelas untuk menyembunyikan film saat pencarian */
+        .movie-item.hidden {
+            opacity: 0 !important;
+            height: 0 !important;
+            /* Sembunyikan margin dan padding agar tidak memakan ruang saat transisi */
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            pointer-events: none; /* Penting: agar item tidak dapat diklik saat tersembunyi */
+        }
+
+
+        .movie-item:hover {
+            transform: scale(1.1); 
+            z-index: 5; 
+            box-shadow: 0 0 15px 5px lightseagreen;
+        }
+        
+        /* PERUBAHAN: Pastikan anchor menutupi gambar */
+        .movie-item a {
+            display: block; /* Agar anchor menempati seluruh ruang */
+            text-decoration: none; /* Hilangkan garis bawah link */
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .movie-item img { 
+            width: 100%; 
+            height: auto;
+            display: block;
+            border-radius: 5px 5px 0 0; 
+        }
+        
+        .movie-item .title { 
+            background-color: white; 
+            color: black; 
+            text-align: center; 
+            width: 100%; 
+            border-radius: 0 0 5px 5px; 
+            padding-top: 5px; 
+            padding-bottom: 5px; 
+        }
+        
+        .movie-item .title a {
+            /* KARENA LINK SUDAH MENGELILINGI GAMBAR DAN JUDUL, atur ulang display */
+            display: block;
+            color: black; 
+            font-size: 1.0em;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .movie-item:hover .title a {
+            color: lightseagreen;
+        }
+        
+        .slide-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            padding: 0;
+        }
+
+        .slide-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        #featured-prev, #action-prev, #kdrama-prev, #kfilm-prev { left: 0; border-radius: 0 5px 5px 0; }
+        #featured-next, #action-next, #kdrama-next, #kfilm-next { right: 0; border-radius: 5px 0 0 5px; }
+        .slide-button[style*="display: none"] { display: none !important; }
+
+        /* --- FOOTER --- */
+        #footer { width: 100%; background-color: #111; color: #aaa; text-align: center; padding: 20px 0; margin-top: 50px; font-size: 0.8em; }
+        #footer a { color: lightseagreen; text-decoration: none; }
+
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <div id="header">
+            <div id="logo">
+                <img src="img/bg7.png" height="120px" alt="Website Logo HDLIX"> 
+            </div>
+            <div id="menu">
+                <ul>
+                    <li><a href="gemini.html">Home</a></li>
+                    <li><a href="moviespage.html">Movies</a></li>
+                    <li><a href="tvshowpage.html">Tv Shows</a></li>
+                    <li><a href="genre.html">Genre</a></li>
+                </ul>
+            </div>
+            
+            <div id="search">
+                <form id="searchForm" method="GET">
+                    <input type="text" name="keyword" id="searchInput" placeholder="Search for movies...">
+                    <input type="submit" value="Search">
+                </form>
+            </div>
+            
+            <div class="separator"></div>
+        </div>
+        
+        <div id="content-container">
+
+            <div id="video-player">
+                <h1 style="font-size: 3.5em; margin: 10px 0; text-shadow: 2px 2px 4px #000;">-HDLIX-</h1>
+                <p style="font-size: 1.2em; text-shadow: 2px 2px 4px #000;">Pilihan utama untuk hiburan Anda.</p>
+            </div>
+
+            <div class="separator"></div>
+            
+            <div class="main-category">
+            
+                <div class="movie-category" id="featured-category">
+                    <h2 class="category-title"> Featured</h2> 
+                    <div class="movie-row-container">
+                        <button class="slide-button" id="featured-prev" onclick="scrollMovies('featured-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="featured-row-wrapper">
+                                                            <div class="movie-item">
+                                <a href="Avatar.html">
+                                    <img src="img/movie/Avatar.jpeg" alt="Avatar: The Way Of Water">
+                                    <div class="title">Avatar: The Way Of Water</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/Fight Club.jpeg" alt="Fight Club">
+                                    <div class="title">Fight Club</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/Inception.jpg" alt="Inception">
+                                    <div class="title">Inception</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/Pulp Fiction.jpg" alt="Pulp Fiction">
+                                    <div class="title">Pulp Fiction</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/SchindlersList.jpg" alt="Schindler's List">
+                                    <div class="title">SchindlersList</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="Avatar.html">
+                                    <img src="img/movie/TheGodFather Part II.jpg" alt="The GodFather Part II">
+                                    <div class="title">TheGodFather Part II</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m7.jpg" alt="The Dark Knight">
+                                    <div class="title">The Dark Knight</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m8.jpg" alt="The God Father">
+                                    <div class="title">The God Father</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m9.jpg" alt="Shawshank Redemption">
+                                    <div class="title">Shawshank Redemption</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m10.jpg" alt="Titanic">
+                                    <div class="title">Titanic</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m11.jpg" alt="Rurouni Kenshin">
+                                    <div class="title">Rurouni Kenshin</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m12.jpg" alt="The Lord Of The Rings">
+                                    <div class="title">The Lord Of The Rings</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <button class="slide-button" id="featured-next" onclick="scrollMovies('featured-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+
+                <div class="movie-category" id="action-category">
+                    <h2 class="category-title"> Film Action</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button" id="action-prev" onclick="scrollMovies('action-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="action-row-wrapper">
+                                                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-1.jpg" alt="Tron Ares">
+                                    <div class="title">Tron Ares</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-2.jpg" alt="Oppenheimer">
+                                    <div class="title">Oppenheimer</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-3.jpg" alt="Godzilla VS Kong">
+                                    <div class="title">Godzilla VS Kong</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-5.jpg" alt="The Flash">
+                                    <div class="title">The Flash</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-6.jpg" alt="Captain America: Brave New World">
+                                    <div class="title">Captain America: Brave New World</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-7.jpg" alt="Extraction 2">
+                                    <div class="title">Extraction 2</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-8.jpg" alt="The Kingsman">
+                                    <div class="title">The Kingsman</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-9.jpg" alt="Equalizer 3">
+                                    <div class="title">Equalizer 3</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-10.jpg" alt="High and Low">
+                                    <div class="title">High and Low</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-11.jpg" alt="Venom: The Last Dance">
+                                    <div class="title">Venom: The Last Dance</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <button class="slide-button" id="action-next" onclick="scrollMovies('action-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+            
+                <div class="movie-category" id="kdrama-category">
+                    <h2 class="category-title"> Drama Korea (K-Drama)</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button" id="kdrama-prev" onclick="scrollMovies('kdrama-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="kdrama-row-wrapper">
+                                                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-12.webp" alt="The Manipulated">
+                                    <div class="title">The Manipulated</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-13.webp" alt="Heroes Next Door">
+                                    <div class="title">Heroes Next Door</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-25.webp" alt="The Veil">
+                                    <div class="title">The Veil</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-14.webp" alt="The Murky Stream">
+                                    <div class="title">The Murky Stream</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-15.webp" alt="Twelve">
+                                    <div class="title">Twelve</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-16.webp" alt="The Art Of Negotiation">
+                                    <div class="title">The Art Of Negotiation</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-17.webp" alt="Buried Hearts">
+                                    <div class="title">Buried Hearts</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-18.webp" alt="Gangnam B-Side">
+                                    <div class="title">Gangnam B-Side</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-19.webp" alt="The Tyrant">
+                                    <div class="title">The Tyrant</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-20.webp" alt="Gyeongseong Creature">
+                                    <div class="title">Gyeongseong Creature</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-21.webp" alt="The Worst Of Evil">
+                                    <div class="title">The Worst Of Evil</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-22.webp" alt="Black Knight">
+                                    <div class="title">Black Knight</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-23.webp" alt="Money Heist: Joint Economic Area">
+                                    <div class="title">Money Heist: Joint Economic Area</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/m-24.webp" alt="My Name">
+                                    <div class="title">My Name</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <button class="slide-button" id="kdrama-next" onclick="scrollMovies('kdrama-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+                
+                <div class="movie-category" id="kfilm-category">
+                    <h2 class="category-title">Film Terbaru</h2>
+                    <div class="movie-row-container">
+                        <button class="slide-button" id="kfilm-prev" onclick="scrollMovies('kfilm-row-wrapper', -600)">&#10094;</button>
+
+                        <div class="movie-row-wrapper" id="kfilm-row-wrapper">
+                                                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft1.webp" alt="Lone Samurai">
+                                    <div class="title">Lone Samurai</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft2.webp" alt="The Smashing Machine">
+                                    <div class="title">The Smashing Machine</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft3.webp" alt="The Conjouring: Last Bites">
+                                    <div class="title">The Conjouring: Last Bites</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft4.webp" alt="Roofman">
+                                    <div class="title">Roofman</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft5.webp" alt="The Shadow's Edge">
+                                    <div class="title">The Shadow's Edge</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft6.webp" alt="The Long Walk">
+                                    <div class="title">The Long Walk</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft7.webp" alt="Dog Patrol: Operation Santa Paws">
+                                    <div class="title">Dog Patrol: Operation Santa Paws</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft8.webp" alt="Black Phone 2">
+                                    <div class="title">Black Phone 2</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft9.webp" alt="Nobody 2">
+                                    <div class="title">Nobody 2</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft10.webp" alt="The Fantastic 4: First Steps">
+                                    <div class="title">The Fantastic 4: First Steps</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft11.webp" alt="The Naked Gun">
+                                    <div class="title">The Naked Gun</div>
+                                </a>
+                            </div>
+                            <div class="movie-item">
+                                <a href="gemini.html">
+                                    <img src="img/movie/ft12.webp" alt="Palestine 36">
+                                    <div class="title">Palestine 36</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <button class="slide-button" id="kfilm-next" onclick="scrollMovies('kfilm-row-wrapper', 600)">&#10095;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer">
+            <p>&copy; 2025 HDLIX. All Rights Reserved. Designed by <a href="#">Prasetyo</a></p>
+        </div>
+    </div>
+    
+    <script>
+        /**
+         * Fungsi utama untuk menggulir baris film secara horizontal.
+         */
+        function scrollMovies(wrapperId, distance) {
+            const wrapper = document.getElementById(wrapperId);
+            
+            if (wrapper) {
+                // Perintah scroll yang sudah menggunakan behavior: 'smooth'
+                wrapper.scrollBy({
+                    left: distance,
+                    behavior: 'smooth'
+                });
+                
+                setTimeout(() => {
+                    updateSlideButtons(wrapperId);
+                }, 500); // Tunggu sebentar setelah scroll selesai untuk update tombol
+            }
+        }
+
+        /**
+         * Fungsi untuk menampilkan atau menyembunyikan tombol prev/next berdasarkan posisi scroll.
+         */
+        function updateSlideButtons(wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+            if (!wrapper) return;
+
+            const categoryName = wrapperId.replace('-row-wrapper', '');
+            const prevButton = document.getElementById(categoryName + '-prev');
+            const nextButton = document.getElementById(categoryName + '-next');
+
+            const scrollLeft = wrapper.scrollLeft;
+            const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+
+            // Tombol Prev
+            if (prevButton) {
+                // Sembunyikan jika scroll di awal
+                if (scrollLeft < 20) {
+                    prevButton.style.display = 'none';
+                } else {
+                    prevButton.style.display = 'flex';
+                }
+            }
+
+            // Tombol Next
+            if (nextButton) {
+                // Sembunyikan kedua tombol jika konten tidak perlu digulir
+                if (wrapper.scrollWidth <= wrapper.clientWidth) {
+                    if (prevButton) prevButton.style.display = 'none';
+                    nextButton.style.display = 'none';
+                // Sembunyikan jika scroll di akhir
+                } else if (scrollLeft >= maxScroll - 20) {
+                    nextButton.style.display = 'none';
+                } else {
+                    nextButton.style.display = 'flex';
+                }
+            }
+        }
+        
+        /**
+         * Fungsi PENCARIAN (LOCAL SEARCH) dengan EFEK TRANSISI.
+         */
+        function filterMovies(keyword) {
+            const categories = document.querySelectorAll('.movie-row-wrapper');
+            const lowerCaseKeyword = keyword.toLowerCase().trim();
+            
+            categories.forEach(wrapper => {
+                const items = wrapper.querySelectorAll('.movie-item');
+                let foundMatchInRow = false;
+
+                items.forEach(item => {
+                    // Ambil teks judul film dari elemen .title (karena sekarang anchor berada di luar .title)
+                    const titleText = item.querySelector('.title').textContent.trim().toLowerCase();
+                    
+                    if (titleText.includes(lowerCaseKeyword)) {
+                        // TAMPILKAN
+                        item.classList.remove('hidden'); 
+                        foundMatchInRow = true;
+                    } else {
+                        // SEMBUNYIKAN
+                        item.classList.add('hidden'); 
+                    }
+                });
+                
+                // Perbarui tombol slide karena item film yang terlihat telah berubah
+                updateSlideButtons(wrapper.id); 
+
+                // Mengelola tampilan judul kategori (movie-category)
+                const movieCategory = wrapper.closest('.movie-category');
+                const categoryTitle = movieCategory ? movieCategory.querySelector('.category-title') : null;
+                
+                // Sembunyikan kategori jika tidak ada film yang cocok DITEMUKAN dan keyword ADA (tidak kosong)
+                if (movieCategory && keyword.length > 0) {
+                    if (foundMatchInRow) {
+                        movieCategory.style.opacity = '1';
+                        movieCategory.style.display = 'block'; // Pastikan terlihat saat ada hasil
+                        if (categoryTitle) categoryTitle.style.display = 'block';
+                    } else {
+                        // Efek fade-out
+                        movieCategory.style.opacity = '0';
+                        // Sembunyikan setelah transisi selesai
+                        setTimeout(() => {
+                            if (movieCategory.style.opacity === '0') {
+                                movieCategory.style.display = 'none';
+                            }
+                        }, 500); 
+                    }
+                } else if (movieCategory && keyword.length === 0) {
+                    // Tampilkan kembali semua saat keyword kosong
+                    movieCategory.style.opacity = '1';
+                    movieCategory.style.display = 'block';
+                    if (categoryTitle) categoryTitle.style.display = 'block';
+                }
+            });
+        }
+        
+        // Atur event listener untuk form pencarian
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah reload halaman
+            const keyword = document.getElementById('searchInput').value;
+            filterMovies(keyword);
+        });
+
+        // Juga tambahkan event listener untuk input agar bisa mencari saat mengetik
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            const keyword = event.target.value;
+            filterMovies(keyword);
+        });
+        
+        // Panggil updateSlideButtons untuk semua kategori saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSlideButtons('featured-row-wrapper');
+            updateSlideButtons('action-row-wrapper');
+            updateSlideButtons('kdrama-row-wrapper');
+            updateSlideButtons('kfilm-row-wrapper');
+            // Pastikan item tidak tersembunyi secara default (penting jika ada bug dari state sebelumnya)
+            document.querySelectorAll('.movie-item').forEach(item => {
+                item.classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
